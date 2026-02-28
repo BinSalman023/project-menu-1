@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #f97316;
+  /* Vibrant Orange for Add to Cart */
+  --color-primary-hover: #ea580c;
+  --color-background: #fafafa;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f4f4f5;
+  --color-text-hard: #0f172a;
+  --color-text-soft: #64748b;
+  --color-border: #e2e8f0;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* Global resets for the design system */
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-hard);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
