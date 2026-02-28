@@ -1,11 +1,10 @@
-// src/data.js
 export const MENU_CATEGORIES = [
     { id: 'porsiyon_doner', label: { ar: 'وجبات الشاورما', tr: 'Porsiyon Döner', en: 'Shawarma Meals' } },
+    { id: 'doner_sandvic', label: { ar: 'ساندويش الشاورما', tr: 'Döner Sandviçler', en: 'Shawarma Sandwiches' } },
     { id: 'bati_porsiyon', label: { ar: 'وجبات الغربي', tr: 'Batı Porsiyonlar', en: 'Western Meals' } },
     { id: 'bati_sandvic', label: { ar: 'ساندويش الغربي', tr: 'Batı Sandviçler', en: 'Western Sandwiches' } },
     { id: 'dogu_porsiyon', label: { ar: 'وجبات الشرقي', tr: 'Doğu Porsiyonlar', en: 'Eastern Meals' } },
     { id: 'pilic_mansaf', label: { ar: 'الفروج والمناسف', tr: 'Tavuk ve Mansaf', en: 'Chicken and Mansaf' } },
-    { id: 'doner_sandvic', label: { ar: 'ساندويش الشاورما', tr: 'Döner Sandviçler', en: 'Shawarma Sandwiches' } },
     { id: 'mezeler', label: { ar: 'المقبلات', tr: 'Mezeler', en: 'Appetizers' } },
     { id: 'icecekler', label: { ar: 'المشروبات', tr: 'İçecekler', en: 'Beverages' } },
 ];

@@ -14,10 +14,11 @@ export default function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  const handleLanguageToggle = () => {
-    const langs = ['ar', 'tr', 'en'];
-    const currentIndex = langs.indexOf(lang);
-    setLang(langs[(currentIndex + 1) % langs.length]);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+
+  const handleLanguageChange = (newLang) => {
+    setLang(newLang);
+    setIsLangOpen(false);
   };
 
   const scrollToCategory = (id) => {
@@ -64,30 +65,63 @@ export default function App() {
       {/* Header Banner */}
       <header className="relative w-full h-64 bg-black overflow-hidden">
         <img
-          src="/images/Western-Box-Meal.jpg" // Using an existing image as hero
+          src="/images/Western-Box-Meal.jpg" // Maintaining the ambiance background
           alt="Restaurant Ambiance"
-          className="absolute inset-0 w-full h-full object-cover opacity-50"
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
         />
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-          <div className="bg-white/10 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 border border-white/20">
-            <ShoppingBag size={18} className="text-white" />
-            <span className="text-white text-sm font-medium">{cartItemCount}</span>
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-20">
+          <div className="bg-white/90 backdrop-blur-md shadow-lg rounded-2xl px-4 py-2 flex items-center gap-3 border border-white/20">
+            <ShoppingBag size={20} className="text-orange-600" />
+            <div className="flex flex-col">
+              <span className="text-gray-900 text-sm font-bold leading-none">{cartTotal} TRY</span>
+              <span className="text-gray-500 text-xs font-medium">{cartItemCount} {t('addCart')}</span>
+            </div>
           </div>
-          <button
-            onClick={handleLanguageToggle}
-            className="bg-white/10 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 text-white border border-white/20 hover:bg-white/20 transition-colors"
-          >
-            <Globe size={18} />
-            <span className="text-sm font-medium uppercase">{lang}</span>
-          </button>
+
+          {/* Language Switcher Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setIsLangOpen(!isLangOpen)}
+              className="bg-white/90 backdrop-blur-md shadow-lg rounded-xl px-4 py-2.5 flex items-center gap-2 text-gray-900 border border-white/20 hover:bg-white transition-all font-medium"
+            >
+              <Globe size={18} className="text-orange-600" />
+              <span className="text-sm uppercase tracking-wide">{lang}</span>
+            </button>
+
+            {isLangOpen && (
+              <div className="absolute top-full mt-2 right-0 bg-white rounded-xl shadow-xl w-32 border border-gray-100 overflow-hidden z-50 animate-slide-up">
+                {[
+                  { id: 'ar', label: 'العربية' },
+                  { id: 'tr', label: 'Türkçe' },
+                  { id: 'en', label: 'English' }
+                ].map((l) => (
+                  <button
+                    key={l.id}
+                    onClick={() => handleLanguageChange(l.id)}
+                    className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors hover:bg-orange-50 ${lang === l.id ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
+                      }`}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
-          <h1 className="text-3xl md:text-5xl font-bold text-white tracking-wide">
-            {lang === 'ar' ? 'مطعم قلعة الشام' : lang === 'tr' ? 'Şam Kalesi Restoranı' : 'Qalaat Al-Sham'}
-          </h1>
-          <p className="text-gray-300 mt-2 text-sm md:text-base font-light">
-            {lang === 'ar' ? 'أصالة المذاق الشامي في إسطنبول' : lang === 'tr' ? 'İstanbul\'da otantik Şam lezzeti' : 'Authentic Levantine taste in Istanbul'}
-          </p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex flex-col justify-end p-6 pb-8">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="w-16 h-16 bg-white rounded-2xl p-1 flex items-center justify-center shadow-2xl">
+              <img src="/images/logo-Qalaat-Al-Sham.png" alt="Qalaat Al-Sham Logo" className="w-full h-full object-contain" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-wide drop-shadow-lg">
+                {lang === 'ar' ? 'مطعم قلعة الشام' : lang === 'tr' ? 'Şam Kalesi Restoranı' : 'Qalaat Al-Sham'}
+              </h1>
+              <p className="text-gray-200 mt-1 text-sm md:text-base font-medium drop-shadow-md">
+                {lang === 'ar' ? 'أصالة المذاق الشامي في إسطنبول' : lang === 'tr' ? 'İstanbul\'da otantik Şam lezzeti' : 'Authentic Levantine taste in Istanbul'}
+              </p>
+            </div>
+          </div>
         </div>
       </header>
 

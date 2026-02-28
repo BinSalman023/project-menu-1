@@ -87,14 +87,20 @@ export default function CheckoutDrawer({ isOpen, onClose, cart, onClearCart }) {
         );
     };
 
-    const deliveryFee = userLoc ? Math.ceil(getDistanceFromLatLonInKm(RESTAURANT_LOC.lat, RESTAURANT_LOC.lng, userLoc.lat, userLoc.lng) * FEE_PER_KM) : 0;
+    // Custom rounding: 21->25, 23->25, 26->30, 29->30, 20->20
+    const calculateRoundedFee = (distanceKm) => {
+        const exactFee = distanceKm * FEE_PER_KM;
+        if (exactFee % 5 === 0) return exactFee;
+        return Math.ceil(exactFee / 5) * 5;
+    };
+
+    const deliveryFee = userLoc ? calculateRoundedFee(getDistanceFromLatLonInKm(RESTAURANT_LOC.lat, RESTAURANT_LOC.lng, userLoc.lat, userLoc.lng)) : 0;
     const subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
     const total = subtotal + deliveryFee;
 
     const generateWhatsAppMessage = () => {
         let text = `*طلب جديد من مطعم قلعة الشام*\n`;
-        text += `\n*العميل:* ${name || 'لم يحدد'}`;
-        text += `\n*الجوال:* ${phone}`;
+        if (name) text += `\n*العميل:* ${name}`;
         if (building || flat) {
             text += `\n*رقم المبنى:* ${building || '-'}, *رقم الشقة:* ${flat || '-'}`;
         }
@@ -125,10 +131,6 @@ export default function CheckoutDrawer({ isOpen, onClose, cart, onClearCart }) {
     };
 
     const handleConfirmOrder = () => {
-        if (!phone) {
-            alert(lang === 'ar' ? 'يرجى إدخال رقم الجوال' : 'Please enter your phone number');
-            return;
-        }
         if (!userLoc) {
             alert(t('locationError'));
             return;
@@ -234,17 +236,6 @@ export default function CheckoutDrawer({ isOpen, onClose, cart, onClearCart }) {
                                 <h3 className="font-bold text-gray-900 mb-2">Customer Details</h3>
 
                                 <div className="space-y-3">
-                                    <div className="relative">
-                                        <Phone className="absolute top-1/2 -translate-y-1/2 left-4 text-gray-400" size={18} />
-                                        <input
-                                            type="tel"
-                                            placeholder="Phone Number (Required)"
-                                            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 outline-none focus:ring-orange-500 focus:bg-white transition-all"
-                                            value={phone}
-                                            onChange={(e) => setPhone(e.target.value)}
-                                            dir="ltr"
-                                        />
-                                    </div>
                                     <input
                                         type="text"
                                         placeholder={t('optionalName')}
@@ -298,9 +289,9 @@ export default function CheckoutDrawer({ isOpen, onClose, cart, onClearCart }) {
 
                         <button
                             onClick={handleConfirmOrder}
-                            disabled={!phone || !userLoc}
+                            disabled={!userLoc}
                             className={`w-full h-14 rounded-xl font-bold flex items-center justify-center gap-2 transform active:scale-[0.98] transition-all shadow-xl shadow-orange-500/20
-                                ${phone && userLoc
+                                ${userLoc
                                     ? 'bg-orange-500 text-white hover:bg-orange-600'
                                     : 'bg-gray-100 text-gray-400'}`}
                         >
