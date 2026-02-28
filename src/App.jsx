@@ -1,71 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingBag, MapPin, ChevronRight, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, ChevronRight, Plus, Search, Globe } from 'lucide-react';
 import ProductDrawer from './components/ProductDrawer';
 import CheckoutDrawer from './components/CheckoutDrawer';
-
-// Mock Data built around luxury aesthetic
-const MENU_CATEGORIES = [
-  { id: 'starters', label: 'Starters' },
-  { id: 'mains', label: 'Signature Mains' },
-  { id: 'drinks', label: 'Beverages' },
-];
-
-const MENU_ITEMS = [
-  {
-    id: 1,
-    categoryId: 'starters',
-    name: 'Wagyu Beef Tataki',
-    description: 'Thinly sliced seared wagyu with ponzu and truffle oil',
-    price: 320,
-    image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=2000&auto=format&fit=crop'
-  },
-  {
-    id: 2,
-    categoryId: 'starters',
-    name: 'Spicy Edamame',
-    description: 'Steamed edamame tossed in garlic chili miso',
-    price: 95,
-    image: 'https://images.unsplash.com/photo-1548610543-de737ea7bb89?q=80&w=2000&auto=format&fit=crop'
-  },
-  {
-    id: 3,
-    categoryId: 'mains',
-    name: 'Black Cod Miso',
-    description: 'Premium black cod marinated in sweet saikyo miso',
-    price: 450,
-    image: 'https://images.unsplash.com/photo-1621852004158-f3bc188ace2d?q=80&w=2000&auto=format&fit=crop'
-  },
-  {
-    id: 4,
-    categoryId: 'mains',
-    name: 'Ribeye Tobanyaki',
-    description: 'Sizzling prime ribeye with mixed mushrooms and yuzu butter',
-    price: 520,
-    image: 'https://images.unsplash.com/photo-1544025162-8316eb5f9ab8?q=80&w=2000&auto=format&fit=crop'
-  },
-  {
-    id: 5,
-    categoryId: 'drinks',
-    name: 'Matcha Lemonade',
-    description: 'Ceremonial grade matcha blended with fresh yuzu lemonade',
-    price: 75,
-    image: 'https://images.unsplash.com/photo-1536935338788-846bb9981813?q=80&w=2000&auto=format&fit=crop'
-  }
-];
+import { MENU_CATEGORIES, MENU_ITEMS } from './data';
+import { useLanguage } from './LanguageContext';
 
 export default function App() {
+  const { lang, setLang, t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState(MENU_CATEGORIES[0].id);
+  const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  // Example function to handle smooth scrolling
+  const handleLanguageToggle = () => {
+    const langs = ['ar', 'tr', 'en'];
+    const currentIndex = langs.indexOf(lang);
+    setLang(langs[(currentIndex + 1) % langs.length]);
+  };
+
   const scrollToCategory = (id) => {
     setActiveCategory(id);
     const element = document.getElementById(id);
+    // Ignore search mode scrolling if elements are filtered out
     if (element) {
-      const offset = 80; // height of sticky nav
+      const offset = 80;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -90,84 +50,122 @@ export default function App() {
   const cartTotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Filter items based on search query in the current language
+  const filteredItems = MENU_ITEMS.filter(item => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const name = item.name[lang] || '';
+    const desc = item.description[lang] || '';
+    return name.toLowerCase().includes(query) || desc.toLowerCase().includes(query);
+  });
+
   return (
-    <div className="min-h-screen pb-24 font-sans bg-white">
-      {/* Header Banner - Luxury Aesthetic, Minimalist */}
+    <div className={`min-h-screen pb-24 font-sans bg-white ${lang === 'ar' ? 'rtl' : 'ltr'}`}>
+      {/* Header Banner */}
       <header className="relative w-full h-64 bg-black overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=2000&auto=format&fit=crop"
+          src="/images/Western-Box-Meal.jpg" // Using an existing image as hero
           alt="Restaurant Ambiance"
-          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
-          <h1 className="text-4xl font-light text-white tracking-widest uppercase bg-clip-text">O R I G I N</h1>
-          <p className="text-gray-300 mt-2 text-sm font-light">Elegance in every bite.</p>
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
+          <div className="bg-white/10 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 border border-white/20">
+            <ShoppingBag size={18} className="text-white" />
+            <span className="text-white text-sm font-medium">{cartItemCount}</span>
+          </div>
+          <button
+            onClick={handleLanguageToggle}
+            className="bg-white/10 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 text-white border border-white/20 hover:bg-white/20 transition-colors"
+          >
+            <Globe size={18} />
+            <span className="text-sm font-medium uppercase">{lang}</span>
+          </button>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
+          <h1 className="text-3xl md:text-5xl font-bold text-white tracking-wide">
+            {lang === 'ar' ? 'مطعم قلعة الشام' : lang === 'tr' ? 'Şam Kalesi Restoranı' : 'Qalaat Al-Sham'}
+          </h1>
+          <p className="text-gray-300 mt-2 text-sm md:text-base font-light">
+            {lang === 'ar' ? 'أصالة المذاق الشامي في إسطنبول' : lang === 'tr' ? 'İstanbul\'da otantik Şam lezzeti' : 'Authentic Levantine taste in Istanbul'}
+          </p>
         </div>
       </header>
 
-      {/* Sticky Category Navigation */}
-      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 overflow-x-auto hide-scrollbar whitespace-nowrap shadow-sm">
-        <ul className="flex space-x-6 items-center">
-          {MENU_CATEGORIES.map(category => (
-            <li key={category.id}>
-              <button
-                onClick={() => scrollToCategory(category.id)}
-                className={`text-sm tracking-wide transition-all ${activeCategory === category.id
-                  ? 'text-orange-500 font-medium border-b-2 border-orange-500 pb-1'
-                  : 'text-gray-500 font-light'
-                  }`}
-              >
-                {category.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {/* Sticky Category Navigation & Search */}
+      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 flex flex-col">
+        {/* Search Bar */}
+        <div className="px-4 py-3 border-b border-gray-100">
+          <div className="relative">
+            <Search className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder={t('searchPlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              dir={lang === 'ar' ? 'rtl' : 'ltr'}
+            />
+          </div>
+        </div>
+
+        {/* Categories (Hide if searching) */}
+        {!searchQuery && (
+          <nav className="px-4 py-3 overflow-x-auto hide-scrollbar whitespace-nowrap">
+            <ul className="flex space-x-6 items-center">
+              {MENU_CATEGORIES.map(category => (
+                <li key={category.id} className="first:ml-0 rtl:last:mr-0">
+                  <button
+                    onClick={() => scrollToCategory(category.id)}
+                    className={`text-sm tracking-wide transition-all ${activeCategory === category.id
+                      ? 'text-orange-500 font-bold border-b-2 border-orange-500 pb-1'
+                      : 'text-gray-500 font-medium'
+                      }`}
+                  >
+                    {category.label[lang]}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </div>
 
       {/* Main Menu Feed */}
       <main className="px-4 py-6 space-y-12 max-w-2xl mx-auto">
-        {MENU_CATEGORIES.map(category => (
-          <section key={category.id} id={category.id} className="scroll-mt-24">
-            <h2 className="text-xl font-light tracking-widest text-gray-900 mb-6 uppercase border-b border-gray-100 pb-2">
-              {category.label}
+        {searchQuery ? (
+          <section>
+            <h2 className="text-xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-100">
+              {t('menu')} - Search Results
             </h2>
-            <div className="flex flex-col space-y-8">
-              {MENU_ITEMS.filter(item => item.categoryId === category.id).map(item => (
-                <article
-                  key={item.id}
-                  onClick={() => handleProductClick(item)}
-                  className="group flex flex-col md:flex-row gap-4 active:scale-[0.98] transition-transform cursor-pointer"
-                >
-                  <div className="relative w-full md:w-32 h-48 md:h-32 overflow-hidden rounded-lg bg-gray-100 shrink-0">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between flex-1 py-1">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900">{item.name}</h3>
-                      <p className="text-sm text-gray-500 font-light mt-1 line-clamp-2 leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between mt-4 md:mt-0">
-                      <span className="text-base font-medium text-gray-900">{item.price} TRY</span>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleProductClick(item); }}
-                        className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 group-hover:bg-orange-50 group-hover:text-orange-500 transition-colors"
-                      >
-                        <Plus size={18} strokeWidth={2} />
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            {filteredItems.length === 0 ? (
+              <p className="text-gray-500 text-center py-10">No items found.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredItems.map(item => (
+                  <MenuCard key={`search-${item.id}`} item={item} lang={lang} t={t} onClick={() => handleProductClick(item)} />
+                ))}
+              </div>
+            )}
           </section>
-        ))}
+        ) : (
+          MENU_CATEGORIES.map(category => {
+            const categoryItems = filteredItems.filter(item => item.categoryId === category.id);
+            if (categoryItems.length === 0) return null;
+
+            return (
+              <section key={category.id} id={category.id} className="scroll-mt-36">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-2">
+                  {category.label[lang]}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {categoryItems.map(item => (
+                    <MenuCard key={item.id} item={item} lang={lang} t={t} onClick={() => handleProductClick(item)} />
+                  ))}
+                </div>
+              </section>
+            );
+          })
+        )}
       </main>
 
       {/* Floating Cart */}
@@ -180,9 +178,9 @@ export default function App() {
             >
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 px-3 py-1 rounded-md text-sm font-medium">{cartItemCount}</div>
-                <span className="font-light tracking-wide">View Order</span>
+                <span className="font-medium tracking-wide">{t('viewOrder')}</span>
               </div>
-              <span className="font-medium">{cartTotal} TRY</span>
+              <span className="font-bold">{cartTotal} {t('currency')}</span>
             </button>
           </div>
         </div>
@@ -195,11 +193,49 @@ export default function App() {
         onClose={() => setIsDrawerOpen(false)}
         onAddToCart={handleAddToCart}
       />
+
       <CheckoutDrawer
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         cart={cart}
+        onClearCart={() => setCart([])}
       />
     </div>
+  );
+}
+
+// Sub-component for Menu Items
+function MenuCard({ item, lang, t, onClick }) {
+  return (
+    <article
+      onClick={onClick}
+      className="group flex flex-row gap-4 active:scale-[0.98] transition-transform cursor-pointer bg-white border border-gray-100 rounded-xl p-3 shadow-sm hover:shadow-md"
+    >
+      <div className="relative w-28 h-28 shrink-0 overflow-hidden rounded-lg bg-gray-50">
+        <img
+          src={item.image}
+          alt={item.name[lang]}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      </div>
+      <div className="flex flex-col justify-between flex-1 py-1 overflow-hidden">
+        <div>
+          <h3 className="text-base font-bold text-gray-900 line-clamp-1">{item.name[lang]}</h3>
+          <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+            {item.description[lang]}
+          </p>
+        </div>
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-sm font-bold text-orange-600">{item.price} {t('currency')}</span>
+          <button
+            onClick={(e) => { e.stopPropagation(); onClick(); }}
+            className="h-8 w-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-colors"
+          >
+            <Plus size={16} strokeWidth={2.5} />
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }
