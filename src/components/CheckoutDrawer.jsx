@@ -99,17 +99,20 @@ export default function CheckoutDrawer({ isOpen, onClose, cart, onClearCart }) {
     const total = subtotal + deliveryFee;
 
     const generateWhatsAppMessage = () => {
-        let text = `*طلب جديد من مطعم قلعة الشام*\n`;
-        if (name) text += `\n*العميل:* ${name}`;
+        let text = `🛍️ *طلب جديد من مطعم قلعة الشام* 🛍️\n`;
+        text += `\n───────────────`;
+        text += `\n👤 *بيانات العميل والتوصيل:*`;
+        if (name) text += `\n*الاسم:* ${name}`;
         if (building || flat) {
-            text += `\n*رقم المبنى:* ${building || '-'}, *رقم الشقة:* ${flat || '-'}`;
+            text += `\n*العنوان:* مبنى ${building || '-'}، شقة ${flat || '-'}`;
         }
 
         if (userLoc) {
-            text += `\n*موقع التوصيل:* https://www.google.com/maps/search/?api=1&query=${userLoc.lat},${userLoc.lng}`;
+            text += `\n*الموقع على الخريطة:* https://www.google.com/maps/search/?api=1&query=${userLoc.lat},${userLoc.lng}`;
         }
 
-        text += `\n\n*تفاصيل الطلب:*`;
+        text += `\n───────────────`;
+        text += `\n📝 *تفاصيل الطلب:*`;
         cart.forEach((item, index) => {
             text += `\n\n${index + 1}. ${item.quantity}x ${item.name['ar']} - ${item.totalPrice} TRY`;
             if (item.selections && item.selections.length > 0) {
@@ -123,9 +126,12 @@ export default function CheckoutDrawer({ isOpen, onClose, cart, onClearCart }) {
             }
         });
 
-        text += `\n\n*المجموع الفرعي:* ${subtotal} TRY`;
+        text += `\n───────────────`;
+        text += `\n💰 *تفاصيل الحساب:*`;
+        text += `\n*المجموع الفرعي:* ${subtotal} TRY`;
         text += `\n*رسوم التوصيل:* ${deliveryFee} TRY`;
         text += `\n*الإجمالي المطلوب:* ${total} TRY`;
+        text += `\n───────────────`;
 
         return encodeURIComponent(text);
     };
