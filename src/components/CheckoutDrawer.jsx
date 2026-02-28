@@ -15,8 +15,8 @@ L.Icon.Default.mergeOptions({
 
 // Restaurant Coordinates (مطعم قلعة الشام)
 const RESTAURANT_LOC = {
-    lat: 41.01185,
-    lng: 28.94821
+    lat: 41.00134562745214,
+    lng: 28.8420208
 };
 const RESTAURANT_PHONE = '+905526599976';
 const FEE_PER_KM = 20;

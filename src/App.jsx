@@ -89,7 +89,7 @@ export default function App() {
             </button>
 
             {isLangOpen && (
-              <div className="absolute top-full mt-2 right-0 bg-white rounded-xl shadow-xl w-32 border border-gray-100 overflow-hidden z-50 animate-slide-up">
+              <div className={`absolute top-full mt-2 ${lang === 'ar' ? 'left-0' : 'right-0'} bg-white rounded-xl shadow-xl w-32 border border-gray-100 overflow-hidden z-[100] animate-slide-up`}>
                 {[
                   { id: 'ar', label: 'العربية' },
                   { id: 'tr', label: 'Türkçe' },
