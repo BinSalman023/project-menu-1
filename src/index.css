@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #f97316;
+  --color-primary: #449c4c;
   /* Vibrant Orange for Add to Cart */
-  --color-primary-hover: #ea580c;
-  --color-background: #fafafa;
+  --color-primary-hover: #3d8b44;
+  --color-background: #ffffff;
   --color-surface: #ffffff;
   --color-surface-hover: #f4f4f5;
-  --color-text-hard: #0f172a;
-  --color-text-soft: #64748b;
-  --color-border: #e2e8f0;
+  --color-text-hard: #449c4c;
+  --color-text-soft: #6b7280;
+  --color-border: #e5e7eb;
 
   --font-sans: 'Inter', system-ui, sans-serif;
 }
